@@ -1,24 +1,15 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-
-defineProps<{ msg: string }>();
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
+  <div class="flex flex-col items-center justify-center min-h-screen text-center space-y-4">
+    <h1 class="text-4xl font-bold text-gray-900">Ostyria</h1>
+    <p class="text-lg text-gray-600">Parliamentary Justice: Act Two</p>
 
-  <div class="card">
-    <p>
-      Edit
-      <code>components/Home.vue</code> to test HMR
-    </p>
+    <RouterLink
+      to="/treasury"
+      class="mt-6 inline-block px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+    >
+      Go to Treasury
+    </RouterLink>
   </div>
-
-  <p class="read-the-docs">Click on the logo to learn what's tracked</p>
 </template>
 
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style>
+<script setup lang="ts"></script>
