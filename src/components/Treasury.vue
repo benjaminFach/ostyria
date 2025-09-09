@@ -46,7 +46,7 @@ type ItemRow = {
 const rows = ref<ItemRow[]>([])
 
 // Replace with your API Gateway invoke URL base (no trailing slash)
-const API_BASE = import.meta.env.VITE_API_BASE as string
+const API_BASE = 'https://70l9flyief.execute-api.us-east-2.amazonaws.com'
 
 onMounted(async () => {
   const res = await fetch(`${API_BASE}/items`)
