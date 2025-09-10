@@ -2,35 +2,22 @@
   <div class="p-6">
     <h2 class="text-2xl font-bold mb-4">Treasury</h2>
 
-    <table class="min-w-full border border-gray-300 text-left">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="px-4 py-2 border-b">Item</th>
-          <th class="px-4 py-2 border-b">Holder</th>
-          <th class="px-4 py-2 border-b">Source</th>
-          <th class="px-4 py-2 border-b">Session Found</th>
-          <th class="px-4 py-2 border-b">Weight</th>
-          <th class="px-4 py-2 border-b">Description</th>
-          <th class="px-4 py-2 border-b">Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="r in rows" :key="r.id" class="odd:bg-white even:bg-gray-50">
-          <td class="px-4 py-2 border-b">{{ r.item }}</td>
-          <td class="px-4 py-2 border-b">{{ r.holder ?? '' }}</td>
-          <td class="px-4 py-2 border-b">{{ r.source ?? '' }}</td>
-          <td class="px-4 py-2 border-b">{{ r.sessionFound ?? '' }}</td>
-          <td class="px-4 py-2 border-b">{{ r.weight ?? '' }}</td>
-          <td class="px-4 py-2 border-b">{{ r.description ?? '' }}</td>
-          <td class="px-4 py-2 border-b">{{ r.value ?? '' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- DataTables component -->
+    <DataTable
+      :data="rows"
+      :columns="columns"
+      class="display stripe hover w-full"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import DataTable from 'datatables.net-vue3'
+import DataTablesCore from 'datatables.net'   // core engine
+
+// hook the core into the Vue wrapper
+DataTable.use(DataTablesCore)
 
 type ItemRow = {
   id: number
@@ -44,6 +31,18 @@ type ItemRow = {
 }
 
 const rows = ref<ItemRow[]>([])
+
+// Column mapping for DataTables (titles match your headers)
+const columns = [
+  { title: 'Item', data: 'item' },
+  { title: 'Holder', data: 'holder' },
+  { title: 'Source', data: 'source' },
+  { title: 'Session Found', data: 'sessionFound' },
+  { title: 'Weight', data: 'weight' },
+  { title: 'Description', data: 'description' },
+  { title: 'Value', data: 'value' },
+]
+
 
 // Replace with your API Gateway invoke URL base (no trailing slash)
 const API_BASE = 'https://70l9flyief.execute-api.us-east-2.amazonaws.com'
