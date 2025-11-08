@@ -1,7 +1,15 @@
 <template>
   <div class="p-6">
-    <h2 class="text-2xl font-bold mb-4">Treasury</h2>
-
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-2xl font-bold mb-4">Treasury</h2>
+      <button
+        type="button"
+        class="px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+        @click="open = true"
+      >
+        Add Item
+      </button>
+    </div>
     <table class="min-w-full border border-gray-300 text-left">
       <thead class="bg-gray-100">
         <tr>
@@ -26,6 +34,82 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Modal (UI only for now) -->
+    <div
+      v-if="open"
+      class="fixed inset-0 z-50 flex items-center justify-center"
+      aria-modal="true"
+      role="dialog"
+    >
+      <!-- backdrop -->
+      <div class="absolute inset-0 bg-black/40" @click="open = false"></div>
+
+      <!-- panel -->
+      <div class="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold">Add Treasury Item</h3>
+          <button
+            type="button"
+            class="p-2 rounded hover:bg-gray-100"
+            @click="open = false"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- simple form fields; no submission yet -->
+        <form class="space-y-4" @submit.prevent>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Item *</span>
+              <input v-model="draft.item" type="text" class="border rounded px-3 py-2" required />
+            </label>
+
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Holder</span>
+              <input v-model="draft.holder" type="text" class="border rounded px-3 py-2" />
+            </label>
+
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Source</span>
+              <input v-model="draft.source" type="text" class="border rounded px-3 py-2" />
+            </label>
+
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Session Found</span>
+              <input v-model.number="draft.sessionFound" type="number" class="border rounded px-3 py-2" />
+            </label>
+
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Weight</span>
+              <input v-model.number="draft.weight" type="number" step="0.01" class="border rounded px-3 py-2" />
+            </label>
+
+            <label class="flex flex-col gap-1">
+              <span class="text-sm text-gray-700">Value</span>
+              <input v-model.number="draft.value" type="number" step="0.01" class="border rounded px-3 py-2" />
+            </label>
+          </div>
+
+          <label class="flex flex-col gap-1">
+            <span class="text-sm text-gray-700">Description</span>
+            <textarea v-model="draft.description" rows="3" class="border rounded px-3 py-2"></textarea>
+          </label>
+
+          <div class="flex items-center justify-end gap-2 pt-2">
+            <button type="button" class="px-3 py-2 rounded border" @click="open = false">Cancel</button>
+            <!-- Disabled until we wire the API -->
+            <button type="submit" class="px-3 py-2 rounded bg-blue-600 text-white opacity-60 cursor-not-allowed">
+              Save (coming next)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
   </div>
 </template>
 
@@ -54,4 +138,17 @@ onMounted(async () => {
   rows.value = await res.json()
   console.log('mounted')
 })
+
+/* Modal UI state only (no submission yet) */
+const open = ref(false)
+const draft = ref<Partial<ItemRow>>({
+  item: '',
+  holder: '',
+  source: '',
+  sessionFound: null,
+  weight: null,
+  description: '',
+  value: null,
+})
+
 </script>
