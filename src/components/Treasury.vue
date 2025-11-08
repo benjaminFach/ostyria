@@ -59,8 +59,10 @@
           </button>
         </div>
 
-        <!-- simple form fields; no submission yet -->
-        <form class="space-y-4" @submit.prevent>
+        <!-- show minimal error -->
+        <p v-if="errorMsg" class="mb-3 text-sm text-red-600">{{ errorMsg }}</p>
+
+        <form class="space-y-4" @submit.prevent="submitNewItem">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label class="flex flex-col gap-1">
               <span class="text-sm text-gray-700">Item *</span>
@@ -99,10 +101,14 @@
           </label>
 
           <div class="flex items-center justify-end gap-2 pt-2">
-            <button type="button" class="px-3 py-2 rounded border" @click="open = false">Cancel</button>
-            <!-- Disabled until we wire the API -->
-            <button type="submit" class="px-3 py-2 rounded bg-blue-600 text-white opacity-60 cursor-not-allowed">
-              Save (coming next)
+            <button type="button" class="px-3 py-2 rounded border" @click="open = false" :disabled="saving">Cancel</button>
+            <button
+              type="submit"
+              class="px-3 py-2 rounded bg-blue-600 text-white"
+              :class="saving ? 'opacity-60 cursor-not-allowed' : ''"
+              :disabled="saving"
+            >
+              {{ saving ? 'Saving…' : 'Save' }}
             </button>
           </div>
         </form>
@@ -141,6 +147,8 @@ onMounted(async () => {
 
 /* Modal UI state only (no submission yet) */
 const open = ref(false)
+const saving = ref(false)
+const errorMsg = ref<string | null>(null)
 const draft = ref<Partial<ItemRow>>({
   item: '',
   holder: '',
@@ -150,5 +158,43 @@ const draft = ref<Partial<ItemRow>>({
   description: '',
   value: null,
 })
+
+async function submitNewItem() {
+  errorMsg.value = null
+  if (!draft.value.item?.trim()) {
+    errorMsg.value = '"Item" is required'
+    return
+  }
+
+  saving.value = true
+  try {
+    const res = await fetch(`${API_BASE}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item: draft.value.item,
+        holder: draft.value.holder,
+        source: draft.value.source,
+        sessionFound: draft.value.sessionFound,
+        weight: draft.value.weight,
+        description: draft.value.description,
+        value: draft.value.value,
+      }),
+    })
+    if (!res.ok) {
+      const t = await res.text()
+      throw new Error(t || `HTTP ${res.status}`)
+    }
+    const created: ItemRow = await res.json()
+    rows.value = [created, ...rows.value]   // show it immediately
+    open.value = false                      // close modal
+    // reset form
+    draft.value = { item: '', holder: '', source: '', sessionFound: null, weight: null, description: '', value: null }
+  } catch (e:any) {
+    errorMsg.value = e?.message || 'Failed to save'
+  } finally {
+    saving.value = false
+  }
+}
 
 </script>
